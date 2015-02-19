@@ -10,25 +10,38 @@ class ReactFractionalFlex extends React.Component {
     wF: 1,
     hF: 1,
     style: {
-      display: 'flex column',
-      //alignSelf: 'center',
-      //overflow: 'hidden'
+      display: 'flex',
+      flexWrap: 'wrap',
+      alignItems: 'center',
+      alignSelf: 'center',
+      alignContent: 'flex-start',
+      justifyContent: 'center',
+      overflow: 'auto'
     },
     ref: 'me'
   };
 
-  state = { rootHeight: 200, rootWidth: 200 };
+  state = { rootHeight: 0, rootWidth: 0 };
 
   render(){
     let { t, children, ...otherProps } = this.props;
 
-    console.log(otherProps);
-    if (otherProps.isFlexChild){
-      otherProps.style.height = otherProps.parentStyle.height * otherProps.hF;
-      otherProps.style.width = otherProps.parentStyle.width * otherProps.wF;
+    if (!otherProps.isFlexChild){
+      otherProps.style.height = this.state.rootHeight * this.props.hF;
+      otherProps.style.width = this.state.rootWidth * this.props.wF;
+      if (this.props.wF === 1){
+        otherProps.style.overflowX = 'hidden';
+      }
+      if (this.props.hF === 1){
+        otherProps.style.overflowY = 'hidden';
+      }
     } else {
-      otherProps.style.height = this.state.rootHeight;
-      otherProps.style.width = this.state.rootWidth;
+      if (otherProps.wF){
+        otherProps.style.width = (100 * otherProps.wF) + '%';
+      }
+      if (otherProps.hF){
+        otherProps.style.height = (100 * otherProps.hF - 1) + '%';
+      }
     }
 
     var flexKids = React.Children.map(this.props.children, child => {
@@ -36,7 +49,6 @@ class ReactFractionalFlex extends React.Component {
         var newProps = {
           key: child.key,
           ref: child.ref,
-          parentStyle: clone(otherProps.style), // need cloning?
           isFlexChild: true
         };
         return cloneWithProps(child, newProps);
@@ -57,7 +69,7 @@ class ReactFractionalFlex extends React.Component {
     var me = this.refs[this.props.ref].getDOMNode();
 
     this.fitText = () => {
-
+      console.log(window.innerWidth, window.innerHeight, document.body.scrollWidth, document.body.scrollHeight);
       this.setState(
         { rootWidth: window.innerWidth, rootHeight: window.innerHeight },
         () => {

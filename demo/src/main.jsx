@@ -6,7 +6,7 @@ class Demo extends React.Component {
   state = { style: {} };
 
   render(){
-    return <F t='div'>
+    return <F t='div' hF={2}>
       <F t='div' wF={1/2} hF={1/4}>
         First Child
       </F>
