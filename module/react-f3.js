@@ -27,6 +27,9 @@ class ReactFractionalFlex extends React.Component {
     let { t, children, ...otherProps } = this.props;
 
     if (!otherProps.isFlexChild){
+      otherProps.style.position = 'relative';
+      otherProps.style.top = this.state.topAdjust;
+      otherProps.style.left = this.state.leftAdjust;
       otherProps.style.height = this.state.rootHeight * this.props.hF;
       otherProps.style.width = this.state.rootWidth * this.props.wF;
       if (this.props.wF === 1){
@@ -68,13 +71,14 @@ class ReactFractionalFlex extends React.Component {
   componentDidMount(){
     var me = this.refs[this.props.ref].getDOMNode();
 
+    var rect = me.getBoundingClientRect();
+    this.setState({ topAdjust: -rect.top, leftAdjust: -rect.left });
     this.fitText = () => {
-      console.log(window.innerWidth, window.innerHeight, document.body.scrollWidth, document.body.scrollHeight);
       this.setState(
         { rootWidth: window.innerWidth, rootHeight: window.innerHeight },
         () => {
           var width = me.offsetWidth / 10 * this.props.textScale;
-          //me.style.fontSize = width + 'px';
+          me.style.fontSize = width + 'px';
         }.bind(this)
       );
     }.bind(this);
@@ -86,6 +90,23 @@ class ReactFractionalFlex extends React.Component {
 
   componentWillUnmount(){
     window.removeEventListener('resize', this.fitText);
+  }
+
+  componentDidUpdate(){
+    if (this.props.isFlexChild){
+      return;
+    }
+
+    if (window.innerWidth >= document.body.scrollWidth){
+      document.body.style.overflowX = 'hidden';
+    } else {
+      document.body.style.overflowX = 'auto';
+    }
+    if (window.innerHeight >= document.body.scrollHeight){
+      document.body.style.overflowY = 'hidden';
+    } else {
+      document.body.style.overflowY = 'auto';
+    }
   }
 
 }
