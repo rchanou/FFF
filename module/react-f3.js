@@ -1,14 +1,12 @@
 import React from 'react/addons';
-import clone from 'clone';
 
-var cloneWithProps = React.addons.cloneWithProps;
 
-class ReactFractionalFlex extends React.Component {
+export default class FlexboxHelper extends React.Component {
 
   static defaultProps = {
     textScale: 1,
-    wF: 1,
-    hF: 1,
+    //wF: 1,
+    //hF: 1,
     style: {
       display: 'flex',
       flexWrap: 'wrap',
@@ -16,7 +14,11 @@ class ReactFractionalFlex extends React.Component {
       alignSelf: 'center',
       alignContent: 'flex-start',
       justifyContent: 'center',
-      overflow: 'auto'
+      overflow: 'auto',
+      border: 'thin solid gray',
+      boxSizing: 'border-box',
+      margin: 0,
+      padding: 0
     },
     ref: 'me'
   };
@@ -30,12 +32,12 @@ class ReactFractionalFlex extends React.Component {
       otherProps.style.position = 'relative';
       otherProps.style.top = this.state.topAdjust;
       otherProps.style.left = this.state.leftAdjust;
-      otherProps.style.height = this.state.rootHeight * this.props.hF;
-      otherProps.style.width = this.state.rootWidth * this.props.wF;
-      if (this.props.wF === 1){
+      otherProps.style.height = this.state.rootHeight * otherProps.hF;
+      otherProps.style.width = this.state.rootWidth * otherProps.wF;
+      if (otherProps.wF === 1){
         otherProps.style.overflowX = 'hidden';
       }
-      if (this.props.hF === 1){
+      if (otherProps.hF === 1){
         otherProps.style.overflowY = 'hidden';
       }
     } else {
@@ -47,14 +49,20 @@ class ReactFractionalFlex extends React.Component {
       }
     }
 
-    var flexKids = React.Children.map(this.props.children, child => {
+    var flexKids = React.Children.map(children, child => {
       if (child.props){
         var newProps = {
           key: child.key,
           ref: child.ref,
           isFlexChild: true
         };
-        return cloneWithProps(child, newProps);
+        if (!child.props.wF){
+          newProps.wF = otherProps.cWF || 1;
+        }
+        if (!child.props.hF){
+          newProps.hF = otherProps.cHF || 1;
+        }
+        return React.addons.cloneWithProps(child, newProps);
       } else {
         return child;
       }
@@ -110,5 +118,3 @@ class ReactFractionalFlex extends React.Component {
   }
 
 }
-
-export default ReactFractionalFlex;
